@@ -18,6 +18,6 @@ public class AccountController {
     @PostMapping("/create-account")
     public ResponseEntity<String> createAccount(@RequestParam @NotBlank String accountNumber) {
         accountService.createAccount(accountNumber);
-        return ResponseEntity.status(HttpStatus.CREATED).body("계좌 생성에 성공했습니다");
+        return ResponseEntity.status(HttpStatus.CREATED).body("계좌 생성에 성공했습니다.");
     }
 }
