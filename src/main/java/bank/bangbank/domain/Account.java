@@ -3,20 +3,30 @@ package bank.bangbank.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-//1
+@Table(name = "account")
 public class Account {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    private String accountNumber;
+    @Column(name = "user_number")
+    private Long userNumber;
 
-    @Enumerated(EnumType.STRING)
-    private AccountStatus accountStatus;
+    @Column(name = "account_balance")
+    private Double accountBalance;
+
+    @Column(name = "account_type")
+    private String accountType;
+
+    @Column(name = "account_number_str", unique = true, length = 14)
+    private String accountNumberStr;
 }
