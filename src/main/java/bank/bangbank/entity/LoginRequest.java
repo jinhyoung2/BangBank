@@ -1,4 +1,4 @@
-package bank.bangbank.domain;
+package bank.bangbank.entity;
 
 import lombok.Getter;
 import lombok.Setter;

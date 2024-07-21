@@ -1,6 +1,9 @@
 package bank.bangbank.controller;
 
-import bank.bangbank.domain.Account;
+import bank.bangbank.dto.AmountRequestDto;
+import bank.bangbank.dto.CreateAccountRequestDto;
+import bank.bangbank.entity.Account;
+import bank.bangbank.entity.TransferHistory;
 import bank.bangbank.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,46 +23,51 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Account> createAccount(@RequestParam Long userNumber) {
-        Account createdAccount = accountService.createAccountForUser(userNumber);
+    @PostMapping
+    public ResponseEntity<Account> createAccount(@RequestBody CreateAccountRequestDto createAccountRequest) {
+        Account createdAccount = accountService.createAccountForUser(createAccountRequest.getUserNumber());
         return new ResponseEntity<>(createdAccount, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{userNumber}")
+    @GetMapping("/user/{userNumber}")
     public ResponseEntity<List<Account>> getAccountsByUserNumber(@PathVariable Long userNumber) {
         List<Account> accounts = accountService.getAccountsByUserNumber(userNumber);
         return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
 
-    @PostMapping("/deposit")
-    public ResponseEntity<Account> deposit(@RequestParam String accountNumber, @RequestParam Double amount) {
-        Account account = accountService.deposit(accountNumber, amount);
+    @PostMapping("/{accountNumber}/deposit")
+    public ResponseEntity<Account> deposit(@PathVariable String accountNumber, @RequestBody AmountRequestDto amountRequest) {
+        Account account = accountService.deposit(accountNumber, amountRequest.getAmount());
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
-    @PostMapping("/withdraw")
-    public ResponseEntity<Account> withdraw(@RequestParam String accountNumber, @RequestParam Double amount) {
-        Account account = accountService.withdraw(accountNumber, amount);
+    @PostMapping("/{accountNumber}/withdraw")
+    public ResponseEntity<Account> withdraw(@PathVariable String accountNumber, @RequestBody AmountRequestDto amountRequest) {
+        Account account = accountService.withdraw(accountNumber, amountRequest.getAmount());
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
-    @PostMapping("/transfer")
-    public ResponseEntity<String> transfer(@RequestParam String fromAccountNumber, @RequestParam String toAccountNumber, @RequestParam Double amount) {
-        accountService.transfer(fromAccountNumber, toAccountNumber, amount);
-        return new ResponseEntity<>("송금이 완료 됐습니다.", HttpStatus.OK);
+    @PostMapping("/{fromAccountNumber}/transfer/{toAccountNumber}")
+    public ResponseEntity<String> transfer(@PathVariable String fromAccountNumber, @PathVariable String toAccountNumber, @RequestBody AmountRequestDto amountRequest) {
+        accountService.transfer(fromAccountNumber, toAccountNumber, amountRequest.getAmount());
+        return new ResponseEntity<>("송금이 완료 되었습니다.", HttpStatus.OK);
     }
 
-    @GetMapping("/balance/{accountNumber}")
+    @GetMapping("/{accountNumber}/balance")
     public ResponseEntity<Double> getBalance(@PathVariable String accountNumber) {
         Double balance = accountService.getBalance(accountNumber);
         return new ResponseEntity<>(balance, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteAccount(@RequestParam String accountNumber) {
+    @DeleteMapping("/{accountNumber}")
+    public ResponseEntity<String> deleteAccount(@PathVariable String accountNumber) {
         accountService.deleteAccount(accountNumber);
         return new ResponseEntity<>("계좌가 삭제되었습니다.", HttpStatus.OK);
     }
 
+    @GetMapping("/{accountNumber}/transfer-history")
+    public ResponseEntity<List<TransferHistory>> getTransferHistory(@PathVariable String accountNumber) {
+        List<TransferHistory> transferHistories = accountService.getTransferHistory(accountNumber);
+        return new ResponseEntity<>(transferHistories, HttpStatus.OK);
+    }
 }

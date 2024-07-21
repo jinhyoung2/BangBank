@@ -1,6 +1,6 @@
 package bank.bangbank.service;
 
-import bank.bangbank.domain.User;
+import bank.bangbank.entity.User;
 import bank.bangbank.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

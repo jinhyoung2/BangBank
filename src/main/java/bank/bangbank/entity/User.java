@@ -1,5 +1,4 @@
-package bank.bangbank.domain;
-
+package bank.bangbank.entity;
 import jakarta.persistence.*;
 import lombok.*;
 @Entity
@@ -8,23 +7,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "user")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_number")
     private Long userNumber;
 
-    @Column(name = "user_id")
     private String userId;
 
-    @Column(name = "username")
     private String username;
 
-    @Column(name = "password")
     private String password;
 
-    @Column(name = "email")
     private String email;
 }
