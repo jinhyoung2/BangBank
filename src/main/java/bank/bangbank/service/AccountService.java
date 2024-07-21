@@ -1,13 +1,16 @@
 package bank.bangbank.service;
 
 import bank.bangbank.AccountNumberGenerator;
-import bank.bangbank.domain.Account;
-import bank.bangbank.domain.User;
+import bank.bangbank.entity.Account;
+import bank.bangbank.entity.TransferHistory;
+import bank.bangbank.entity.User;
 import bank.bangbank.repository.AccountRepository;
+import bank.bangbank.repository.TransferHistoryRepository;
 import bank.bangbank.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -15,11 +18,13 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final TransferHistoryRepository transferHistoryRepository;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository, TransferHistoryRepository transferHistoryRepository) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.transferHistoryRepository = transferHistoryRepository;
     }
 
     public Account createAccountForUser(Long userNumber) {
@@ -77,6 +82,17 @@ public class AccountService {
 
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
+
+        TransferHistory transferHistory = new TransferHistory();
+        transferHistory.setFromAccountNumber(fromAccountNumber);
+        transferHistory.setToAccountNumber(toAccountNumber);
+        transferHistory.setAmount(amount);
+        transferHistory.setTimestamp(LocalDateTime.now());
+        transferHistoryRepository.save(transferHistory);
+    }
+
+    public List<TransferHistory> getTransferHistory(String accountNumber) {
+        return transferHistoryRepository.findByFromAccountNumberOrToAccountNumber(accountNumber, accountNumber);
     }
 
     public Double getBalance(String accountNumber) {
@@ -84,6 +100,7 @@ public class AccountService {
                 .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
         return account.getAccountBalance();
     }
+
     public void deleteAccount(String accountNumber) {
         Account account = accountRepository.findByAccountNumberStr(accountNumber)
                 .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));

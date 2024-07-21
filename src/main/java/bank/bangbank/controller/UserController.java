@@ -1,7 +1,9 @@
 package bank.bangbank.controller;
 
-import bank.bangbank.domain.LoginRequest;
-import bank.bangbank.domain.User;
+import bank.bangbank.dto.LoginRequestDto;
+import bank.bangbank.dto.LoginResponseDto;
+import bank.bangbank.dto.RegisterUserRequestDto;
+import bank.bangbank.dto.UserDto;
 import bank.bangbank.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,16 +22,17 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public User registerUser(@RequestBody User user) {
-        return userService.registerUser(user);
+    public UserDto registerUser(@RequestBody RegisterUserRequestDto registerUserRequestDto) {
+        return userService.registerUser(registerUserRequestDto);
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestBody LoginRequest loginRequest) {
-        if (userService.authenticateUser(loginRequest)) {
-            return "로그인 성공";
+    public LoginResponseDto loginUser(@RequestBody LoginRequestDto loginRequestDto) {
+        boolean isAuthenticated = userService.authenticateUser(loginRequestDto);
+        if (isAuthenticated) {
+            return new LoginResponseDto("로그인 성공");
         } else {
-            return "로그인 실패: 아이디 또는 비밀번호를 확인하세요.";
+            return new LoginResponseDto("로그인 실패: 아이디 또는 비밀번호를 확인하세요.");
         }
     }
 }
