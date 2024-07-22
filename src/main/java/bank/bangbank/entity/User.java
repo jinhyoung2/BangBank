@@ -1,6 +1,7 @@
 package bank.bangbank.entity;
 import jakarta.persistence.*;
 import lombok.*;
+
 @Entity
 @Getter
 @Setter
