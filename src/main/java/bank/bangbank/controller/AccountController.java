@@ -25,7 +25,7 @@ public class AccountController {
 
     @PostMapping
     public ResponseEntity<Account> createAccount(@RequestBody CreateAccountRequestDto createAccountRequest) {
-        Account createdAccount = accountService.createAccountForUser(createAccountRequest.getUserNumber());
+        Account createdAccount = accountService.createAccountForUser(createAccountRequest.getUserNumber(), createAccountRequest.getAccountType());
         return new ResponseEntity<>(createdAccount, HttpStatus.CREATED);
     }
 
@@ -69,5 +69,11 @@ public class AccountController {
     public ResponseEntity<List<TransferHistory>> getTransferHistory(@PathVariable String accountNumber) {
         List<TransferHistory> transferHistories = accountService.getTransferHistory(accountNumber);
         return new ResponseEntity<>(transferHistories, HttpStatus.OK);
+    }
+
+    @PostMapping("/apply-interest")
+    public ResponseEntity<String> applyInterest() {
+        accountService.applyInterest();
+        return new ResponseEntity<>("이자가 적용되었습니다.", HttpStatus.OK);
     }
 }

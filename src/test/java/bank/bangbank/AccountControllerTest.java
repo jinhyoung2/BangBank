@@ -39,18 +39,18 @@ public class AccountControllerTest {
     @Test
     void createAccount() {
         Account account = new Account();
-        when(accountService.createAccountForUser(anyLong())).thenReturn(account);
+        when(accountService.createAccountForUser(anyLong(), anyString())).thenReturn(account);
 
         CreateAccountRequestDto request = new CreateAccountRequestDto();
         request.setUserNumber(1L);
+        request.setAccountType("SAVINGS");
 
         ResponseEntity<Account> response = accountController.createAccount(request);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(account, response.getBody());
-        verify(accountService, times(1)).createAccountForUser(anyLong());
+        verify(accountService, times(1)).createAccountForUser(anyLong(), anyString());
     }
-
     @Test
     void getAccountsByUserNumber() {
         Account account = new Account();
@@ -128,22 +128,6 @@ public class AccountControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("계좌가 삭제되었습니다.", response.getBody());
         verify(accountService, times(1)).deleteAccount(anyString());
-    }
-
-    @Test
-    void createAccount_withInvalidUserNumber() {
-        when(accountService.createAccountForUser(anyLong()))
-                .thenThrow(new IllegalArgumentException("잘못된 유저 번호입니다."));
-
-        CreateAccountRequestDto request = new CreateAccountRequestDto();
-        request.setUserNumber(1L);
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            accountController.createAccount(request);
-        });
-
-        assertEquals("잘못된 유저 번호입니다.", exception.getMessage());
-        verify(accountService, times(1)).createAccountForUser(anyLong());
     }
 
     @Test

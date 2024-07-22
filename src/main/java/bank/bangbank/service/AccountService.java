@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -27,7 +28,7 @@ public class AccountService {
         this.transferHistoryRepository = transferHistoryRepository;
     }
 
-    public Account createAccountForUser(Long userNumber) {
+    public Account createAccountForUser(Long userNumber, String accountType) {
         User user = userRepository.findById(userNumber)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 유저 번호입니다."));
 
@@ -39,9 +40,14 @@ public class AccountService {
         Account account = Account.builder()
                 .userNumber(userNumber)
                 .accountBalance(0.0)
-                .accountType("SAVINGS")
+                .accountType(accountType)
                 .accountNumberStr(accountNumber)
                 .build();
+
+        if (accountType.equals("DEPOSIT")) {
+            account.setInterestRate(0.05);
+            account.setLastInterestApplied(LocalDateTime.now());
+        }
 
         return accountRepository.save(account);
     }
@@ -105,5 +111,20 @@ public class AccountService {
         Account account = accountRepository.findByAccountNumberStr(accountNumber)
                 .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
         accountRepository.delete(account);
+    }
+
+    public void applyInterest() {
+        List<Account> depositAccounts = accountRepository.findByAccountType("DEPOSIT");
+        for (Account account : depositAccounts) {
+            if (account.getInterestRate() != null && account.getLastInterestApplied() != null) {
+                long months = ChronoUnit.MONTHS.between(account.getLastInterestApplied(), LocalDateTime.now());
+                if (months > 0) {
+                    double newBalance = account.getAccountBalance() * Math.pow(1 + account.getInterestRate(), months);
+                    account.setAccountBalance(newBalance);
+                    account.setLastInterestApplied(account.getLastInterestApplied().plusMonths(months));
+                    accountRepository.save(account);
+                }
+            }
+        }
     }
 }

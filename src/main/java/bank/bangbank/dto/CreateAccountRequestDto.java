@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class CreateAccountRequestDto {
     private Long userNumber;
-
+    private String accountType;
 }
